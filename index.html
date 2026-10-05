@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en" class="dark select-none">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOUPSS — Post Tot Proelia | Interactive Garden Experience</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Confetti Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['"Cinzel Decorative"', 'serif'],
+                        cormorant: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        sunset: {
+                            950: '#070407',
+                            900: '#120810',
+                            800: '#1f0d1a',
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 8s ease-in-out infinite alternate',
+                        'float': 'float 6s ease-in-out infinite',
+                        'sunbeam': 'sunbeam 12s ease-in-out infinite alternate',
+                        'spin-slow': 'spin 22s linear infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { opacity: '0.35', transform: 'scale(0.96)' },
+                            '100%': { opacity: '0.8', transform: 'scale(1.06)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        sunbeam: {
+                            '0%': { opacity: '0.12', transform: 'rotate(-30deg) translateY(-15px)' },
+                            '100%': { opacity: '0.4', transform: 'rotate(-20deg) translateY(15px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #060305;
+            color: #fdf8f5;
+            overflow-x: hidden;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #060305; }
+        ::-webkit-scrollbar-thumb { background: rgba(251, 86, 7, 0.4); border-radius: 3px; }
+
+        .glass-card-translucent {
+            background: rgba(12, 6, 12, 0.35);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 190, 11, 0.25);
+            box-shadow: 0 30px 90px -10px rgba(0, 0, 0, 0.9),
+                        inset 0 1px 2px 0 rgba(255, 235, 200, 0.2),
+                        inset 0 -1px 2px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        .border-gold-glow {
+            position: relative;
+        }
+        .border-gold-glow::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 190, 11, 0.75), rgba(255, 133, 161, 0.35), rgba(6, 214, 160, 0.45));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .readable-quote-text {
+            font-family: 'Cormorant Garamond', serif !important;
+            background: linear-gradient(120deg, #ffffff 0%, #fff2d0 25%, #ffe082 55%, #ffb3c6 80%, #ffd1dc 100%);
+            background-size: 280% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 18px rgba(255, 190, 11, 0.25));
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            animation: quoteShimmer 9s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+        }
+
+        @keyframes quoteShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 65% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .readable-subquote-text {
+            font-family: 'Cormorant Garamond', serif !important;
+            background: linear-gradient(120deg, #ffffff 0%, #ffecb3 30%, #ffd1dc 78%, #f8bbd0 100%);
+            background-size: 280% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.95));
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            animation: subQuoteShimmer 10s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+        }
+
+        @keyframes subQuoteShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 60% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .ooupss-letter {
+            display: inline-block;
+            animation: flowerColorShift 4s ease-in-out infinite alternate;
+            transition: transform 0.3s ease;
+        }
+        .ooupss-letter:hover { transform: translateY(-3px) scale(1.1); }
+
+        @keyframes flowerColorShift {
+            0% { color: #ffbe0b; text-shadow: 0 0 12px rgba(255, 190, 11, 0.8); }
+            25% { color: #ffb4a2; text-shadow: 0 0 12px rgba(255, 180, 162, 0.8); }
+            50% { color: #c8b6ff; text-shadow: 0 0 12px rgba(200, 182, 255, 0.8); }
+            75% { color: #06d6a0; text-shadow: 0 0 12px rgba(6, 214, 160, 0.8); }
+            100% { color: #ffee32; text-shadow: 0 0 12px rgba(255, 238, 50, 0.8); }
+        }
+
+        .eq-bar {
+            width: 5px;
+            height: 4px;
+            border-radius: 3px;
+            transition: height 0.08s ease;
+            animation: flowerBgShift 4s ease-in-out infinite alternate;
+        }
+
+        .play-btn-shimmer {
+            animation: flowerBgShift 4s ease-in-out infinite alternate;
+            color: #060305;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .play-btn-shimmer:hover { transform: scale(1.08); }
+
+        @keyframes flowerBgShift {
+            0% { background-color: #ffbe0b; box-shadow: 0 0 15px rgba(255, 190, 11, 0.6); }
+            25% { background-color: #ffb4a2; box-shadow: 0 0 15px rgba(255, 180, 162, 0.6); }
+            50% { background-color: #c8b6ff; box-shadow: 0 0 15px rgba(200, 182, 255, 0.6); }
+            75% { background-color: #06d6a0; box-shadow: 0 0 15px rgba(6, 214, 160, 0.6); }
+            100% { background-color: #ffee32; box-shadow: 0 0 15px rgba(255, 238, 50, 0.6); }
+        }
+
+        #interactiveCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .lang-tab { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+        .lang-tab.active {
+            background: rgba(255, 190, 11, 0.25);
+            color: #ffe066;
+            border-color: rgba(255, 190, 11, 0.6);
+            box-shadow: 0 0 20px rgba(255, 190, 11, 0.35);
+        }
+
+        .sunbeam {
+            position: fixed;
+            top: -30%; left: 15%;
+            width: 500px; height: 160%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 190, 11, 0.08) 50%, transparent 100%);
+            transform: rotate(-30deg);
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center relative selection:bg-amber-900/60 selection:text-amber-200 font-sans antialiased overflow-x-hidden">
+
+    <canvas id="interactiveCanvas"></canvas>
+
+    <div class="sunbeam animate-sunbeam"></div>
+    <div class="sunbeam animate-sunbeam" style="left: 60%; animation-delay: -6s; width: 400px;"></div>
+
+    <div class="fixed top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-gradient-to-br from-amber-600/20 via-orange-600/15 to-transparent blur-[160px] rounded-full pointer-events-none z-0 animate-pulse-glow"></div>
+    <div class="fixed bottom-[-10%] right-1/4 w-[700px] h-[450px] bg-gradient-to-tr from-amber-800/20 via-emerald-700/15 to-transparent blur-[160px] rounded-full pointer-events-none z-0 animate-pulse-glow" style="animation-delay: -4s;"></div>
+
+    <!-- Header -->
+    <header class="w-full max-w-5xl px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-4 z-10 relative">
+        <div class="flex items-center gap-3.5 group cursor-default">
+            <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-emerald-400 p-[1px] shadow-lg shadow-amber-500/20 transition-transform duration-500 group-hover:scale-105">
+                <div class="w-full h-full bg-sunset-950 rounded-[15px] flex items-center justify-center p-0.5">
+                    <span class="font-cinzel text-[10px] font-black tracking-widest text-amber-400 uppercase">OUPS</span>
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-cinzel tracking-[0.25em] text-sm font-bold flex gap-0.5">
+                    <span class="ooupss-letter" style="animation-delay: 0s;">O</span>
+                    <span class="ooupss-letter" style="animation-delay: 0.3s;">O</span>
+                    <span class="ooupss-letter" style="animation-delay: 0.6s;">U</span>
+                    <span class="ooupss-letter" style="animation-delay: 0.9s;">P</span>
+                    <span class="ooupss-letter" style="animation-delay: 1.2s;">S</span>
+                    <span class="ooupss-letter" style="animation-delay: 1.5s;">S</span>
+                </span>
+                <span class="text-[10px] uppercase tracking-widest text-amber-200/60 font-medium">Post Tot Proelia — Garden</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
+            <div class="flex items-center p-1 rounded-full bg-sunset-900/60 border border-amber-500/25 backdrop-blur-md shadow-inner">
+                <button id="btnLat" data-lang="la" class="lang-tab active px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-amber-200 border border-transparent">
+                    LAT <span class="hidden sm:inline text-[10px] opacity-70 ml-1">(Latin)</span>
+                </button>
+                <button id="btnEng" data-lang="en" class="lang-tab px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-amber-200 border border-transparent">
+                    ENG <span class="hidden sm:inline text-[10px] opacity-70 ml-1">(English)</span>
+                </button>
+            </div>
+
+            <button id="copyQuoteBtn" class="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/15 to-orange-500/15 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/35 text-xs font-semibold text-amber-100 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25 active:scale-95 group">
+                <i class="fa-solid fa-sparkles text-amber-400 group-hover:rotate-12 transition-transform duration-300"></i>
+                <span id="copyBtnText">Copy Quote</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-4xl px-4 py-6 sm:py-8 z-10 my-auto flex flex-col items-center">
+        
+        <!-- Audio element -->
+        <audio id="audioElement" preload="auto" crossorigin="anonymous">
+            <source src="https://files.catbox.moe/as2qtc.mp3" type="audio/mpeg">
+            <source src="https://ia801503.us.archive.org/15/items/ambient-relaxing-music/childhood.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Quote Glass Card -->
+        <div class="glass-card-translucent border-gold-glow w-full rounded-3xl p-8 sm:p-14 relative overflow-hidden animate-float">
+            
+            <div class="absolute -top-32 -right-32 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex flex-col items-center text-center space-y-6 relative z-10">
+                
+                <div class="flex items-center justify-center">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-b from-amber-500/30 via-orange-500/20 to-emerald-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 text-2xl shadow-xl shadow-amber-500/20 group hover:rotate-12 transition-transform duration-500">
+                        <i class="fa-solid fa-seedling drop-shadow-[0_0_15px_rgba(255,190,11,0.8)]"></i>
+                    </div>
+                </div>
+
+                <!-- Main Quote -->
+                <div class="space-y-6 max-w-3xl min-h-[140px] sm:min-h-[160px] flex items-center justify-center">
+                    <h1 id="quoteDisplay" class="font-cormorant italic text-4xl sm:text-6xl md:text-7xl font-black leading-relaxed sm:leading-snug tracking-wide readable-quote-text">
+                        «Post tot proelia, cicatrices nostrae floribus tegantur - in hortum pulchrum conversae»
+                    </h1>
+                </div>
+
+                <div class="flex items-center gap-4 w-full max-w-xs my-2 opacity-80">
+                    <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+                    <i class="fa-solid fa-flower text-xs text-amber-400 animate-spin-slow"></i>
+                    <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"></div>
+                </div>
+
+                <!-- Sub-Quote -->
+                <div class="max-w-3xl min-h-[50px] flex items-center justify-center">
+                    <p id="quoteSubDisplay" class="font-cormorant italic text-2xl sm:text-3xl md:text-4xl font-bold leading-relaxed tracking-wide readable-subquote-text">
+                        «After so many battles, let our scars be covered with flowers - turned into a beautiful garden»
+                    </p>
+                </div>
+
+                <!-- Perfectly Symmetrical Footer: Play Button - OOUPSS - Equalizer -->
+                <div class="pt-4 flex flex-col items-center space-y-3 group cursor-default w-full">
+                    <span class="text-[11px] uppercase tracking-[0.35em] text-amber-300/80 font-semibold">Aphorism by</span>
+                    
+                    <div class="grid grid-cols-[1fr_auto_1fr] items-center w-full max-w-2xl mx-auto px-2 gap-5 sm:gap-10">
+                        
+                        <!-- Play Button (Симметричный отступ слева) -->
+                        <div class="flex justify-end">
+                            <button id="playBtn" class="play-btn-shimmer w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-base font-bold shadow-lg active:scale-95 shrink-0">
+                                <i id="playIcon" class="fa-solid fa-play ml-0.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- OOUPSS Title (Строго по центру) -->
+                        <div class="relative flex flex-col items-center justify-center text-center">
+                            <span class="font-cinzel text-3xl sm:text-4xl font-black tracking-[0.25em] flex gap-1 justify-center pl-[0.25em]">
+                                <span class="ooupss-letter" style="animation-delay: 0s;">O</span>
+                                <span class="ooupss-letter" style="animation-delay: 0.3s;">O</span>
+                                <span class="ooupss-letter" style="animation-delay: 0.6s;">U</span>
+                                <span class="ooupss-letter" style="animation-delay: 0.9s;">P</span>
+                                <span class="ooupss-letter" style="animation-delay: 1.2s;">S</span>
+                                <span class="ooupss-letter" style="animation-delay: 1.5s;">S</span>
+                            </span>
+                            <div class="w-full h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500 mt-1"></div>
+                        </div>
+
+                        <!-- Music Equalizer (Симметричный отступ справа) -->
+                        <div class="flex justify-start">
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/50 border border-amber-500/20 backdrop-blur-md shrink-0">
+                                <i class="fa-solid fa-music text-amber-400 text-xs mr-0.5"></i>
+                                <div class="flex items-end gap-1 h-7 px-0.5">
+                                    <div class="eq-bar" style="animation-delay: 0s;"></div>
+                                    <div class="eq-bar" style="animation-delay: 0.5s;"></div>
+                                    <div class="eq-bar" style="animation-delay: 1s;"></div>
+                                    <div class="eq-bar" style="animation-delay: 1.5s;"></div>
+                                    <div class="eq-bar" style="animation-delay: 2s;"></div>
+                                    <div class="eq-bar" style="animation-delay: 2.5s;"></div>
+                                    <div class="eq-bar" style="animation-delay: 3s;"></div>
+                                    <div class="eq-bar" style="animation-delay: 3.5s;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-5xl px-6 py-6 text-center text-xs text-amber-200/50 z-10 space-y-1">
+        <p>© OOUPSS. All rights reserved. «Scars bloom into gardens»</p>
+        <p class="text-[10px] text-amber-200/35">Audio track "childhood" belongs to daniel.mp3, Zamaro. Used for non-commercial preview.</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-sunset-900/95 border border-amber-400/40 text-xs font-semibold text-amber-100 shadow-2xl backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500 z-50 flex items-center gap-3">
+        <div class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <span id="toastMsg">Quote copied to clipboard!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const quotes = {
+                la: {
+                    main: "«Post tot proelia, cicatrices nostrae floribus tegantur - in hortum pulchrum conversae»",
+                    sub: "«After so many battles, let our scars be covered with flowers - turned into a beautiful garden»",
+                    copyText: "«Post tot proelia, cicatrices nostrae floribus tegantur - in hortum pulchrum conversae»\nOOUPSS"
+                },
+                en: {
+                    main: "«After so many battles, let our scars be covered with flowers - turned into a beautiful garden»",
+                    sub: "«Post tot proelia, cicatrices nostrae floribus tegantur - in hortum pulchrum conversae»",
+                    copyText: "«After so many battles, let our scars be covered with flowers - turned into a beautiful garden»\nOOUPSS"
+                }
+            };
+
+            const quoteDisplay = document.getElementById('quoteDisplay');
+            const quoteSubDisplay = document.getElementById('quoteSubDisplay');
+            const langButtons = document.querySelectorAll('.lang-tab');
+            let currentLang = 'la';
+
+            langButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selectedLang = btn.getAttribute('data-lang');
+                    if (selectedLang === currentLang) return;
+
+                    currentLang = selectedLang;
+                    langButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    quoteDisplay.style.opacity = '0';
+                    quoteDisplay.style.transform = 'translateY(10px)';
+                    quoteSubDisplay.style.opacity = '0';
+                    quoteSubDisplay.style.transform = 'translateY(10px)';
+
+                    setTimeout(() => {
+                        quoteDisplay.innerHTML = quotes[currentLang].main;
+                        quoteSubDisplay.innerHTML = quotes[currentLang].sub;
+                        
+                        quoteDisplay.style.opacity = '1';
+                        quoteDisplay.style.transform = 'translateY(0)';
+                        quoteSubDisplay.style.opacity = '1';
+                        quoteSubDisplay.style.transform = 'translateY(0)';
+                    }, 300);
+                });
+            });
+
+            // AUDIO PLAYER LOGIC
+            const audio = document.getElementById('audioElement');
+            const playBtn = document.getElementById('playBtn');
+            const playIcon = document.getElementById('playIcon');
+            const eqBars = document.querySelectorAll('.eq-bar');
+
+            let audioCtx, analyser, dataArray;
+            let isAudioInitialized = false;
+            let isPlaying = false;
+            let synthInterval = null;
+            let isFallbackMode = false;
+
+            function initAudioContext() {
+                if (isAudioInitialized) return;
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                
+                try {
+                    const source = audioCtx.createMediaElementSource(audio);
+                    source.connect(analyser);
+                    analyser.connect(audioCtx.destination);
+                } catch (e) {}
+
+                isAudioInitialized = true;
+            }
+
+            function startSynthAmbient() {
+                isFallbackMode = true;
+                if (!audioCtx) return;
+                
+                const notes = [220, 277.18, 329.63, 440, 554.37, 659.25];
+                synthInterval = setInterval(() => {
+                    if (!isPlaying) return;
+                    try {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        const freq = notes[Math.floor(Math.random() * notes.length)];
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        
+                        gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 0.8);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.8);
+                        
+                        osc.connect(gain);
+                        gain.connect(analyser);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 3);
+                    } catch(err) {}
+                }, 800);
+            }
+
+            function stopSynthAmbient() {
+                if (synthInterval) {
+                    clearInterval(synthInterval);
+                    synthInterval = null;
+                }
+            }
+
+            playBtn.addEventListener('click', () => {
+                initAudioContext();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                if (!isPlaying) {
+                    isPlaying = true;
+                    playIcon.className = "fa-solid fa-pause";
+                    
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            isFallbackMode = false;
+                            updateEqualizer();
+                        }).catch(err => {
+                            startSynthAmbient();
+                            updateEqualizer();
+                        });
+                    } else {
+                        updateEqualizer();
+                    }
+                } else {
+                    isPlaying = false;
+                    audio.pause();
+                    stopSynthAmbient();
+                    playIcon.className = "fa-solid fa-play ml-0.5";
+                }
+            });
+
+            function updateEqualizer() {
+                if (isPlaying && analyser) {
+                    analyser.getByteFrequencyData(dataArray);
+
+                    eqBars.forEach((bar, index) => {
+                        let value = dataArray[index * 2] || 0;
+                        if (isFallbackMode) {
+                            value = Math.floor(Math.random() * 180) + 50;
+                        }
+                        const barHeight = Math.max(4, (value / 255) * 26);
+                        bar.style.height = `${barHeight}px`;
+                    });
+
+                    requestAnimationFrame(updateEqualizer);
+                } else {
+                    eqBars.forEach(bar => bar.style.height = '4px');
+                }
+            }
+
+            // Interactive Garden Canvas Physics
+            const canvas = document.getElementById('interactiveCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+
+            function resizeCanvas() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const mouse = { x: -1000, y: -1000, px: -1000, py: -1000 };
+
+            function handlePointerMove(x, y) {
+                mouse.px = mouse.x; mouse.py = mouse.y;
+                mouse.x = x; mouse.y = y;
+
+                if (Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py) > 4) {
+                    spawnGardenTrail(mouse.x, mouse.y, mouse.px, mouse.py);
+                }
+            }
+
+            window.addEventListener('mousemove', (e) => handlePointerMove(e.clientX, e.clientY));
+            window.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            const scarLines = [];
+            const flowers = [];
+            const vines = [];
+            const pollenParticles = [];
+
+            class ScarLine {
+                constructor(x1, y1, x2, y2) {
+                    this.x1 = x1; this.y1 = y1; this.x2 = x2; this.y2 = y2;
+                    this.life = 1.0; this.decay = 0.015;
+                }
+                update() { this.life -= this.decay; }
+                draw() {
+                    if (this.life <= 0) return;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(this.x1, this.y1);
+                    ctx.lineTo(this.x2, this.y2);
+                    ctx.strokeStyle = `rgba(255, 190, 11, ${this.life * 0.8})`;
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ffbe0b';
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+
+            class Vine {
+                constructor(x, y) {
+                    this.points = [{ x, y }];
+                    this.angle = Math.random() * Math.PI * 2;
+                    this.speed = Math.random() * 2.5 + 1.2;
+                    this.maxLen = Math.floor(Math.random() * 35) + 15;
+                    this.life = 1.0;
+                }
+                update() {
+                    if (this.points.length < this.maxLen) {
+                        this.angle += (Math.random() - 0.5) * 0.45;
+                        const last = this.points[this.points.length - 1];
+                        this.points.push({
+                            x: last.x + Math.cos(this.angle) * this.speed,
+                            y: last.y + Math.sin(this.angle) * this.speed
+                        });
+                    }
+                    this.life -= 0.008;
+                }
+                draw() {
+                    if (this.points.length < 2 || this.life <= 0) return;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(this.points[0].x, this.points[0].y);
+                    for (let i = 1; i < this.points.length; i++) {
+                        ctx.lineTo(this.points[i].x, this.points[i].y);
+                    }
+                    ctx.strokeStyle = `rgba(6, 214, 160, ${this.life * 0.75})`;
+                    ctx.lineWidth = 2.5;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#06d6a0';
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+
+            class CursorFlower {
+                constructor(x, y) {
+                    this.x = x; this.y = y;
+                    this.size = 0;
+                    this.maxSize = Math.random() * 14 + 9;
+                    this.bloomSpeed = Math.random() * 0.5 + 0.35;
+                    this.petals = Math.floor(Math.random() * 3) + 5;
+                    
+                    const colorPalette = [
+                        { main: '#ffbe0b', center: '#ffffff' },
+                        { main: '#ffb4a2', center: '#ffffff' },
+                        { main: '#c8b6ff', center: '#ffbe0b' },
+                        { main: '#06d6a0', center: '#ffffff' }
+                    ];
+                    this.palette = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                    this.rotation = Math.random() * Math.PI * 2;
+                    this.life = 1.0;
+                    this.decay = Math.random() * 0.007 + 0.0035;
+                }
+                update() {
+                    if (this.size < this.maxSize) this.size += this.bloomSpeed;
+                    this.life -= this.decay;
+                }
+                draw() {
+                    if (this.life <= 0) return;
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotation);
+                    ctx.globalAlpha = Math.max(0, this.life);
+
+                    ctx.fillStyle = this.palette.main;
+                    ctx.shadowBlur = 14;
+                    ctx.shadowColor = this.palette.main;
+                    for (let i = 0; i < this.petals; i++) {
+                        ctx.rotate((Math.PI * 2) / this.petals);
+                        ctx.beginPath();
+                        ctx.ellipse(this.size * 0.65, 0, this.size * 0.5, this.size * 0.3, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    ctx.beginPath();
+                    ctx.fillStyle = this.palette.center;
+                    ctx.arc(0, 0, this.size * 0.28, 0, Math.PI * 2);
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = '#ffffff';
+                    ctx.fill();
+
+                    ctx.restore();
+                }
+            }
+
+            class Pollen {
+                constructor(x, y) {
+                    this.x = x; this.y = y;
+                    this.vx = (Math.random() - 0.5) * 1.8;
+                    this.vy = (Math.random() - 0.5) * 1.8 - 0.6;
+                    this.size = Math.random() * 3 + 1;
+                    this.life = 1.0;
+                    this.color = Math.random() > 0.4 ? '#ffbe0b' : '#ffffff';
+                }
+                update() {
+                    this.x += this.vx; this.y += this.vy;
+                    this.life -= 0.012;
+                }
+                draw() {
+                    if (this.life <= 0) return;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = Math.max(0, this.life);
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            function spawnGardenTrail(x, y, px, py) {
+                scarLines.push(new ScarLine(px, py, x, y));
+                if (Math.random() < 0.7) flowers.push(new CursorFlower(x, y));
+                if (Math.random() < 0.45) vines.push(new Vine(x, y));
+                for (let i = 0; i < 3; i++) pollenParticles.push(new Pollen(x, y));
+            }
+
+            class AmbientParticle {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = height + Math.random() * 30;
+                    this.vy = -(Math.random() * 0.7 + 0.25);
+                    this.size = Math.random() * 3.2 + 1;
+                    this.opacity = Math.random() * 0.65 + 0.2;
+                }
+                update() {
+                    this.y += this.vy;
+                    this.x += Math.sin(this.y * 0.008) * 0.5;
+                    if (this.y < -20) this.reset();
+                }
+                draw() {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 190, 11, ${this.opacity})`;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ffbe0b';
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            const ambients = Array.from({ length: 45 }, () => new AmbientParticle());
+
+            function render() {
+                ctx.clearRect(0, 0, width, height);
+
+                ambients.forEach(p => { p.update(); p.draw(); });
+
+                for (let i = scarLines.length - 1; i >= 0; i--) {
+                    scarLines[i].update(); scarLines[i].draw();
+                    if (scarLines[i].life <= 0) scarLines.splice(i, 1);
+                }
+
+                for (let i = vines.length - 1; i >= 0; i--) {
+                    vines[i].update(); vines[i].draw();
+                    if (vines[i].life <= 0) vines.splice(i, 1);
+                }
+
+                for (let i = flowers.length - 1; i >= 0; i--) {
+                    flowers[i].update(); flowers[i].draw();
+                    if (flowers[i].life <= 0) flowers.splice(i, 1);
+                }
+
+                for (let i = pollenParticles.length - 1; i >= 0; i--) {
+                    pollenParticles[i].update(); pollenParticles[i].draw();
+                    if (pollenParticles[i].life <= 0) pollenParticles.splice(i, 1);
+                }
+
+                requestAnimationFrame(render);
+            }
+            render();
+
+            // Copy Quote
+            const copyBtn = document.getElementById('copyQuoteBtn');
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = quotes[currentLang].copyText;
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('Quote copied to clipboard!');
+                    triggerConfetti();
+                } catch (err) {
+                    showToast('Failed to copy.');
+                }
+                document.body.removeChild(textArea);
+            });
+
+            function showToast(msg) {
+                toastMsg.innerText = msg;
+                toast.classList.remove('opacity-0', 'pointer-events-none');
+                toast.classList.add('opacity-100');
+
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100');
+                    toast.classList.add('opacity-0', 'pointer-events-none');
+                }, 3500);
+            }
+
+            function triggerConfetti() {
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 80,
+                        spread: 90,
+                        origin: { y: 0.8 },
+                        colors: ['#ffbe0b', '#ffb4a2', '#c8b6ff', '#06d6a0', '#ffffff']
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
